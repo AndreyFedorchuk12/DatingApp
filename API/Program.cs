@@ -8,6 +8,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddCors();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(policyBuilder => policyBuilder.AllowAnyHeader().WithOrigins("https://localhost:4200"));
 
 app.MapControllers();
 
