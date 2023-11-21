@@ -1,4 +1,5 @@
 using API.Extensions;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(policyBuilder => policyBuilder.AllowAnyHeader().WithOrigins("https://localhost:4200"));
 
 app.UseAuthentication();
