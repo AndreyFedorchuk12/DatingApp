@@ -32,7 +32,8 @@ public class AccountController: BaseApiController
         {
             UserName = registerDto.UserName.ToLower(),
             PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-            PasswordSalt = hmac.Key
+            PasswordSalt = hmac.Key,
+            DateOfBirth = DateOnly.FromDateTime(DateTime.Now)
         };
 
         _dataContext.Users.Add(user);

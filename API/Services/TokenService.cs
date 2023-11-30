@@ -18,11 +18,11 @@ public class TokenService : ITokenService
                                                                            "Cannot generate JWT")));
     }
 
-    public string CreateToken(AppUser user)
+    public string CreateToken(AppUser? user)
     {
         var claims = new List<Claim>
         {
-            new (JwtRegisteredClaimNames.NameId, user.UserName)
+            new (JwtRegisteredClaimNames.NameId, user?.UserName ?? throw new InvalidOperationException())
         };
 
         var credentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha512Signature);

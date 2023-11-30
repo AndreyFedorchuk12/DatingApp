@@ -27,12 +27,15 @@ public class ExceptionMiddleware
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            httpContext.Response.ContentType = "application/json";
-            httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            if (!httpContext.Response.HasStarted)
+            {
+                httpContext.Response.ContentType = "application/json; charset=utf-8";
+                httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
 
             var response = _environment.IsDevelopment()
-                ? new ApiException(httpContext.Response.StatusCode, e.Message, e.StackTrace)
-                : new ApiException(httpContext.Response.StatusCode, e.Message, "Internal server error");
+                ? new ApiException((int)HttpStatusCode.InternalServerError, e.Message, e.StackTrace)
+                : new ApiException((int)HttpStatusCode.InternalServerError, e.Message, "Internal server error");
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
