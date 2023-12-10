@@ -42,4 +42,11 @@ public class UserRepository: IUserRepository
             .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
             .SingleOrDefaultAsync();
     }
+    
+    public async Task<AppUser?> GetUserByUsernameAsync(string? username)
+    {
+        return await _dataContext.Users
+            .Include(user => user.Photos)
+            .SingleOrDefaultAsync(user => user.UserName == username);
+    }
 }
