@@ -5,19 +5,19 @@
       <div class="card-body">
         <div>
           <strong>Location:</strong>
-          <p>{{member.city}}, {{member.country}}</p>
+          <p>{{ member.city }}, {{ member.country }}</p>
         </div>
         <div>
           <strong>Age:</strong>
-          <p>{{member.age}}</p>
+          <p>{{ member.age }}</p>
         </div>
         <div>
           <strong>Last active:</strong>
-          <p>{{member.lastActiveAt}}</p>
+          <p>{{ member.lastActiveAt | timeago }}</p>
         </div>
         <div>
           <strong>Member since:</strong>
-          <p>{{member.createdAt}}</p>
+          <p>{{ member.createdAt | date:"longDate" }}</p>
         </div>
       </div>
       <div class="card-footer">
@@ -33,13 +33,13 @@
     <tabset class="member-tabset">
       <tab heading="About {{member.knownAs}}">
         <h4>Description</h4>
-        <p>{{member.introduction}}</p>
+        <p>{{ member.introduction }}</p>
         <h4>Looking for</h4>
-        <p>{{member.lookingFor}}</p>
+        <p>{{ member.lookingFor }}</p>
       </tab>
       <tab heading="Interests">
         <h4>Interests</h4>
-        <p>{{member.interests}}</p>
+        <p>{{ member.interests }}</p>
       </tab>
       <tab heading="Photos" #photoTab="tab">
         <gallery *ngIf="photoTab.active" [items]="images" class="gallery"></gallery>

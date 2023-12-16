@@ -32,7 +32,7 @@ public class AccountController : BaseApiController
         var user = _mapper.Map<AppUser>(registerDto);
 
         using var hmac = new HMACSHA512();
-        
+
         user.UserName = registerDto.UserName.ToLower();
         user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
         user.PasswordSalt = hmac.Key;
@@ -44,7 +44,8 @@ public class AccountController : BaseApiController
         {
             Token = _tokenService.CreateToken(user),
             UserName = user.UserName,
-            KnownAs = user.KnownAs
+            KnownAs = user.KnownAs,
+            Gender = user.Gender
         };
     }
 
@@ -71,7 +72,8 @@ public class AccountController : BaseApiController
             Token = _tokenService.CreateToken(user),
             UserName = user.UserName,
             PhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain)?.Url,
-            KnownAs = user.KnownAs
+            KnownAs = user.KnownAs,
+            Gender = user.Gender
         };
     }
 

@@ -22,7 +22,8 @@ public class TokenService : ITokenService
     {
         var claims = new List<Claim>
         {
-            new (JwtRegisteredClaimNames.NameId, user?.UserName ?? throw new InvalidOperationException())
+            new(JwtRegisteredClaimNames.NameId, user?.Id.ToString() ?? throw new InvalidOperationException()),
+            new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? throw new InvalidOperationException())
         };
 
         var credentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha512Signature);
