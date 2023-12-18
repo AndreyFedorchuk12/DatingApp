@@ -49,16 +49,30 @@ public class MessagesController : BaseApiController
     [HttpGet]
     public async Task<ActionResult<PagedList<MessageDto>>> GetMessagesForUser([FromQuery] MessageParams messageParams)
     {
-        var username = User.GetUsername();
+        messageParams.UserName = User.GetUsername();
         var messages = await _messageRepository.GetMessagesForUser(messageParams);
         Response.AddPaginationHeader(new PaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages));
         return Ok(messages);
     }
     
-    [HttpGet]
+    [HttpGet("thread/{username}")]
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string username)
     {
         var currentUsername = User.GetUsername();
         return Ok(await _messageRepository.GetMessageThread(currentUsername, username));
+    }
+    
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteMessage(int id)
+    {
+        var username = User.GetUsername();
+        var message = await _messageRepository.GetMessage(id);
+        if (message == null) return NotFound();
+        if (message.SenderUsername != username && message.RecipientUsername != username) return Unauthorized();
+        if (message.SenderUsername == username) message.SenderDeleted = true;
+        if (message.RecipientUsername == username) message.RecipientDeleted = true;
+        if (message is { SenderDeleted: true, RecipientDeleted: true }) _messageRepository.DeleteMessage(message);
+        if (!await _messageRepository.SaveAllAsync()) return BadRequest("Problem deleting the message");
+        return Ok();
     }
 }
