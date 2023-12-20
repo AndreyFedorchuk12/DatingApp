@@ -11,5 +11,5 @@ public class Photo
     public string? PublicId { get; set; }
 
     public int AppUserId { get; set; }
-    public required AppUser AppUser { get; set; }
+    public  AppUser? AppUser { get; set; }
 }

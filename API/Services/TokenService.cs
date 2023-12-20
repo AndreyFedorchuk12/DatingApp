@@ -3,22 +3,25 @@ using System.Security.Claims;
 using System.Text;
 using API.Entities;
 using API.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
 public class TokenService : ITokenService
 {
+    private readonly UserManager<AppUser> _userManager;
     private readonly SymmetricSecurityKey _securityKey;
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration, UserManager<AppUser> userManager)
     {
+        _userManager = userManager;
         _securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["TokenKey"] ??
                                                                        throw new InvalidOperationException(
                                                                            "Cannot generate JWT")));
     }
 
-    public string CreateToken(AppUser? user)
+    public async Task<string> CreateToken(AppUser? user)
     {
         var claims = new List<Claim>
         {
@@ -26,6 +29,10 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? throw new InvalidOperationException())
         };
 
+        var roles = await _userManager.GetRolesAsync(user);
+        
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+        
         var credentials = new SigningCredentials(_securityKey, SecurityAlgorithms.HmacSha512Signature);
 
         var tokenDescriptor = new SecurityTokenDescriptor
