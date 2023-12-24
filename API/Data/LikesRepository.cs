@@ -35,19 +35,19 @@ public class LikesRepository : ILikesRepository
         switch (likesParams.Predicate)
         {
             case "liked":
-                likes = likes.Where(like => like != null && like.SourceUserId == likesParams.UserId);
-                users = likes.Select(like => like!.TargetUser);
+                likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
+                users = likes.Select(like => like!.TargetUser)!;
                 break;
             case "likedBy":
-                likes = likes.Where(like => like != null && like.TargetUserId == likesParams.UserId);
-                users = likes.Select(like => like!.SourceUser);
+                likes = likes.Where(like => like.TargetUserId == likesParams.UserId);
+                users = likes.Select(like => like!.SourceUser)!;
                 break;
         }
 
         var likedUsers = users.Select(user => new LikeDto
         {
             Id = user.Id,
-            UserName = user.UserName,
+            UserName = user.UserName!,
             Age = user.DateOfBirth.CalculateAge(),
             KnownAs = user.KnownAs,
             City = user.City,

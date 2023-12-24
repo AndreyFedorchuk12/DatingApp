@@ -35,7 +35,9 @@ public class BuggyController: BaseApiController
     public ActionResult<string> GetServerError()
     {
         var notFoundUser = _dataContext.Users.Find(-1);
-        return notFoundUser!.UserName;
+        var actionResult = notFoundUser!.UserName;
+        if (actionResult != null) return actionResult;
+        throw new Exception("This is a server error");
     }
     
     [HttpGet("bad-request")]

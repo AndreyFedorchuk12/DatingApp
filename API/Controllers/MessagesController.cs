@@ -59,7 +59,8 @@ public class MessagesController : BaseApiController
     public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string username)
     {
         var currentUsername = User.GetUsername();
-        return Ok(await _messageRepository.GetMessageThread(currentUsername, username));
+        if (currentUsername != null) return Ok(await _messageRepository.GetMessageThread(currentUsername, username));
+        return BadRequest("Unauthorized");
     }
     
     [HttpDelete("{id:int}")]

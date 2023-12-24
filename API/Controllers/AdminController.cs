@@ -19,10 +19,10 @@ public class AdminController : BaseApiController
     [HttpGet("users-with-roles")]
     public async Task<ActionResult> GetUserWithRole()
     {
-        var users = await _userManager.Users.Include(r => r.UserRoles)
+        var users = await _userManager.Users.Include(r => r.UserRoles)!
             .ThenInclude(r => r.Role)
             .OrderBy(u => u.UserName)
-            .Select(u => new { u.Id, Username = u.UserName, Roles = u.UserRoles.Select(r => r.Role!.Name).ToList() })
+            .Select(u => new { u.Id, Username = u.UserName, Roles = u.UserRoles!.Select(r => r.Role!.Name).ToList() })
             .ToListAsync();
         return Ok(users);
     }
