@@ -20,9 +20,7 @@ public static class ApplicationServiceExtensions
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<ILikesRepository, LikesRepository>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
         services.AddScoped<IPhotoService, PhotoService>();

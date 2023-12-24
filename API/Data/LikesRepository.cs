@@ -56,9 +56,4 @@ public class LikesRepository : ILikesRepository
         
         return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageNumber, likesParams.PageSize);
     }
-    
-    public async Task<bool> SaveAllAsync()
-    {
-        return await _dataContext.SaveChangesAsync() > 0;
-    }
 }

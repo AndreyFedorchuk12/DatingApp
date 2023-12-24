@@ -24,11 +24,6 @@ public class UserRepository : IUserRepository
         _dataContext.Entry(user).State = EntityState.Modified;
     }
 
-    public async Task<bool> SaveAllAsync()
-    {
-        return await _dataContext.SaveChangesAsync() > 0;
-    }
-
     public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
     {
         var query = _dataContext.Users.AsQueryable();
@@ -71,5 +66,12 @@ public class UserRepository : IUserRepository
     public async Task<AppUser?> GetUserByIdAsync(int userId)
     {
         return await _dataContext.Users.FindAsync(userId);
+    }
+
+    public async Task<string> GetUserGender(string username)
+    {
+        return (await _dataContext.Users.Where(user => user.UserName == username)
+            .Select(user => user.Gender)
+            .SingleOrDefaultAsync())!;
     }
 }
