@@ -40,7 +40,8 @@ public class UsersController : BaseApiController
     [HttpGet("{username}")]
     public async Task<ActionResult<MemberDto?>> GetUser(string username)
     {
-        return await _unitOfWork.UserRepository.GetMembersByUsernameAsync(username);
+        var currentUsername = User.GetUsername();
+        return await _unitOfWork.UserRepository.GetMemberByUsernameAsync(username, isCurrentUser: currentUsername == username);
     }
 
     [HttpPut]
@@ -74,10 +75,7 @@ public class UsersController : BaseApiController
         if (result.Error != null)
             return BadRequest(result.Error.Message);
 
-        var photo = new Photo { Url = result.SecureUrl.AbsoluteUri, PublicId = result.PublicId, AppUser = user };
-
-        if (user.Photos.Count == 0)
-            photo.IsMain = true;
+        var photo = new Photo { Url = result.SecureUrl.AbsoluteUri, PublicId = result.PublicId, AppUser = user, IsMain = false, IsApproved = false};
 
         user.Photos.Add(photo);
         if (await _unitOfWork.Complete())
@@ -101,6 +99,9 @@ public class UsersController : BaseApiController
 
         if (photo == null)
             return NotFound();
+        
+        if (!photo.IsApproved)
+            return BadRequest("Cannot set as main unapproved photo");
 
         if (photo.IsMain)
             return BadRequest("This is already the main photo");
@@ -121,19 +122,21 @@ public class UsersController : BaseApiController
     [HttpDelete("delete-photo/{photoId}")]
     public async Task<ActionResult> DeletePhoto(int photoId)
     {
-        var username = User.GetUsername();
-        var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
-        if (user == null) return NotFound();
-        var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
-        if (photo == null) return NotFound();
-        if (photo.IsMain) return BadRequest("You cannot delete your main photo");
-        if (photo.PublicId != null)
+        var photo = await _unitOfWork.PhotoRepository.GetPhotoByIdAsync(photoId);
+        switch (photo)
         {
-            var result = await _photoService.DeletePhotoAsync(photo.PublicId);
-            if (result.Error != null) return BadRequest(result.Error.Message);
+            case { IsMain: true }:
+                return BadRequest("You cannot delete your main photo");
+            case { IsApproved: false }:
+                return BadRequest("You cannot delete unapproved photo");
+            case { PublicId: not null }:
+            {
+                _unitOfWork.PhotoRepository.RemovePhoto(photo);
+                break;
+            }
         }
-
-        user.Photos.Remove(photo);
+        var user = await _unitOfWork.UserRepository.GetUserByPhotoId(photoId);
+        if (photo != null) user?.Photos.Remove(photo);
         if (await _unitOfWork.Complete()) return Ok();
         return BadRequest("Failed to delete photo");
     }
