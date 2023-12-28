@@ -12,10 +12,6 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DataContext>(options =>
-        {
-            options.UseSqlite(configuration.GetConnectionString("DefaultConnection"));
-        });
         services.AddCors();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();

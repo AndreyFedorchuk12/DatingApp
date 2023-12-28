@@ -1,5 +1,3 @@
-using API.Data.Migrations;
-
 namespace API.DTOs;
 
 public class PhotoForApprovalDto

@@ -7,6 +7,11 @@ namespace API.Data;
 
 public class Seed
 {
+    public static async Task ClearConnection(DataContext dataContext)
+    {
+        dataContext.Connections.RemoveRange(dataContext.Connections);
+        await dataContext.SaveChangesAsync();
+    }
     public static async Task SeedUser(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         if(await userManager.Users.AnyAsync())
@@ -32,7 +37,8 @@ public class Seed
             foreach (var user in users.OfType<AppUser>())
             {
                 if (user.UserName != null) user.UserName = user.UserName.ToLower();
-                
+                user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+                user.LastActiveAt = DateTime.SpecifyKind(user.LastActiveAt, DateTimeKind.Utc);
                 var result = await userManager.CreateAsync(user, "Password1");
                 if (result.Succeeded)
                 {
